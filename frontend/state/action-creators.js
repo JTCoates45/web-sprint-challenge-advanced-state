@@ -52,7 +52,35 @@ export function resetForm() {
   }
 }
 
-
+// ❗ Async action creators
+export function fetchQuiz() {
+  return function (dispatch) {
+   axios.get(`http://localhost:9000/api/quiz/next`)
+   .then(res => {
+     console.log(res)
+     dispatch(setQuiz(res.data))
+   })
+   .catch(err => {
+     console.log(err)
+   })
+  }
+}
+export function postAnswer({quiz_id, answer_id}) {
+  return function (dispatch) {
+    axios.post( `http://localhost:9000/api/quiz/answer`, { quiz_id, answer_id})
+    .then(res => {
+      console.log(res)
+      dispatch(selectAnswer(null))
+      dispatch(setQuiz(null))
+      dispatch(fetchQuiz())
+      dispatch(setMessage(res.data.message))
+    })
+    // On successful POST:
+    // - Dispatch an action to reset the selected answer state
+    // - Dispatch an action to set the server message to state
+    // - Dispatch the fetching of the next quiz
+  }
+}
 export function postQuiz({
   question_text, 
   true_answer_text, 
